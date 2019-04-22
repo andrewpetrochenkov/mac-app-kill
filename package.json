@@ -1,0 +1,14 @@
+{
+  "name": "mac-app-kill",
+  "version": "2019.4.22",
+  "description": "kill macOS app(s) by name, bundleID, path",
+  "keywords": [
+    "mac",
+    "app"
+  ],
+  "homepage": "https://github.com/looking-for-a-job/mac-app-kill",
+  "license": "Unlicense",
+  "bin": {
+    "app-kill": "./scripts/app-kill"
+  }
+}

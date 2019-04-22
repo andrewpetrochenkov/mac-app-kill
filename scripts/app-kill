@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+{ set +x; } 2>/dev/null
+
+usage() {
+    echo "usage: $(basename $0) app ..." 1>&2
+    [[ $1 == "-h" ]] || [[ $1 == "--help" ]]; exit
+}
+
+[[ $1 == "-h" ]] || [[ $1 == "--help" ]] && usage "$@"
+
+[[ $# == 0 ]] && usage
+
+LC_ALL=C
+shopt -s nocasematch
+out="$(
+while [[ $# != 0 ]]; do
+    # name/bundleID
+    lsappinfo="$(lsappinfo info -only pid "$1" 2> /dev/null)"
+    [[ -n $lsappinfo ]] && {
+        echo "$lsappinfo" | awk '{split($0,a,"=");print a[2]}'; shift && continue
+    }
+
+    matches="$(ps -Axo pid,command | grep ".app/Contents/MacOS/" | grep -i "$1")"
+    [[ -n "$matches" ]] && while IFS= read l; do
+        [[ "$l" == *"/Contents/MacOS/"*/* ]] && continue # exclude nested apps/services
+        [ -e "$1" ] && ! [ -e "$1/Contents/MacOS" ] && continue # exclude not app paths
+        pid="$(echo $l | awk '{print $1}')"
+
+        [[ "$l" == *"$1"/Contents/MacOS/* ]] && echo $pid && continue
+        [[ "$l" == *"$1".app/Contents/MacOS/* ]] && echo $pid && continue
+    done <<< "$matches"
+    shift
+done
+)"
+[[ -n "$out" ]] && { IFS=$'\n'; set $out; kill "$@" 2> /dev/null; };:
+
