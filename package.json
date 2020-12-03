@@ -1,6 +1,6 @@
 {
   "name": "mac-app-kill",
-  "version": "2019.4.22",
+  "version": "2020.12.3",
   "description": "kill macOS app(s) by name, bundleID, path",
   "keywords": [
     "mac",
